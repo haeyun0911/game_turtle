@@ -86,16 +86,31 @@ def race_step():
     winner_found = False
     winning_turtle_index = -1 # 승리한 거북이의 인덱스
 
+    # 경계선 정의 (화면 크기의 절반에서 약간의 여유)
+    top_boundary = screen.window_height() / 2 - 20
+    bottom_boundary = -screen.window_height() / 2 + 20
+    left_boundary = -screen.window_width() / 2 + 20 # 왼쪽 경계 추가
+
     for i, t in enumerate(turtles):
         forward_distance = random.randint(min_speed, max_speed)
+        
         angle_change = random.randint(-max_angle_change, max_angle_change)
         t.left(angle_change)
 
         current_x, current_y = t.xcor(), t.ycor()
         
-        if current_y > 230 or current_y < -230:
+        # Y축 (상하) 경계 처리
+        if current_y > top_boundary or current_y < bottom_boundary:
             t.setheading(t.heading() + 180)
         
+        # X축 (왼쪽) 경계 처리 추가
+        # 거북이가 왼쪽 경계를 벗어나려고 할 때 (거의 처음 위치이거나 그보다 왼쪽으로 갈 때)
+        if current_x < left_boundary:
+            t.setheading(t.heading() + 180) # 방향 180도 전환 (뒤로 돌아 오른쪽으로 향하게 함)
+            # 만약 거북이가 경계에 걸려 버벅거리는 느낌이 있다면,
+            # t.forward(forward_distance) 대신 t.goto(left_boundary, current_y) 같이
+            # 경계 안으로 위치를 강제 이동시켜 줄 수도 있습니다.
+            
         t.forward(forward_distance)
 
         if t.xcor() >= finish_line_x:
